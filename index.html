@@ -82,6 +82,32 @@
       box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
       border: 1px solid rgba(0, 0, 0, 0.04);
     }
+    .slide-hint {
+      text-align: center;
+      color: #0f6f8a;
+      font-weight: 700;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .gender-nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .nav-btn {
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #0f6f8a;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+      transition: transform 0.12s ease, box-shadow 0.2s ease;
+    }
+    .nav-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 18px rgba(0,0,0,0.08); }
+    .nav-btn:active { transform: translateY(1px); }
     .panel {
       border-radius: 18px;
       padding: 18px 14px;
@@ -256,13 +282,13 @@
     .modal__illustration {
       width: 100%;
       height: 140px;
-      background: var(--cfa-softgray);
+      background: transparent;
       border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      border: 1px solid rgba(0, 0, 0, 0.05);
+      border: none;
     }
     .modal__illustration img {
       width: 100%;
@@ -356,10 +382,17 @@
         <button class="modal__close" id="modalClose" aria-label="結果を閉じる">×</button>
         <p class="badge" id="modalBadge">診断結果</p>
         <h3 class="modal__title" id="modalTitle">診断結果がここに表示されます</h3>
-        <div class="modal__bar">
-          <div class="modal__bar-fill" id="modalBar"></div>
+        <div class="modal__body">
+          <div>
+            <div class="modal__bar">
+              <div class="modal__bar-fill" id="modalBar"></div>
+            </div>
+            <p class="modal__text" id="modalText">「診断する」を押すと、ポップアップで結果が届きます。</p>
+          </div>
+          <div class="modal__illustration">
+            <img id="modalImage" src="" alt="結果イラストのプレースホルダー">
+          </div>
         </div>
-        <p class="modal__text" id="modalText">「診断する」を押すと、ポップアップで結果が届きます。</p>
         <div class="modal__footer">
           <span id="modalSummary"></span>
           <span id="modalPercent"></span>
@@ -439,6 +472,13 @@
     const modalPercent = document.getElementById("modalPercent");
     const modalClose = document.getElementById("modalClose");
     const modalBadge = document.getElementById("modalBadge");
+    const modalImage = document.getElementById("modalImage");
+
+    const resultImages = {
+      master: "1.png",
+      mid: "2.png",
+      start: "3.png"
+    };
     let currentGender = "male";
 
     function render() {
@@ -496,15 +536,19 @@
 
       let title = "";
       let text = "";
+      let imageKey = "start";
       if (ratio >= 0.8) {
         title = "プレコン準備マスター！";
         text = "日々のケアがしっかりできています。この調子で続けつつ、パートナーと一緒にアップデートしていきましょう。";
+        imageKey = "master";
       } else if (ratio >= 0.5) {
         title = "いい感じ！もうひと踏ん張り";
         text = "できていることがたくさんあります。気になる項目を一つずつ増やして、安心を積み上げていきましょう。";
+        imageKey = "mid";
       } else {
         title = "まずはできるところから";
         text = "今日から変えられる項目を一つ選んで実行してみてください。小さな一歩が未来の家族の安心につながります。";
+        imageKey = "start";
       }
 
       resultTitle.textContent = title;
@@ -513,7 +557,8 @@
         title,
         text: `チェック数 ${checked} / ${total}。${text}`,
         percent,
-        summary: `${checked}項目クリア / ${total}項目`
+        summary: `${checked}項目クリア / ${total}項目`,
+        imageKey
       });
     }
 
@@ -536,7 +581,7 @@
     diagnoseBtn.addEventListener("click", diagnose);
     resetBtn.addEventListener("click", resetChecks);
 
-    function openModal({ title, text, percent, summary }) {
+    function openModal({ title, text, percent, summary, imageKey }) {
       const data = checklist[currentGender];
       modalTitleEl.textContent = title;
       modalTextEl.textContent = text;
@@ -545,6 +590,8 @@
       modalBadge.textContent = `${data.title}の診断`;
       modalBadge.style.background = data.bg;
       modalBadge.style.color = "#0f6f8a";
+      modalImage.src = resultImages[imageKey] || "";
+      modalImage.alt = `${title} のイラスト`;
       modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");
       modalClose.focus();
