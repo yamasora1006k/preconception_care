@@ -9,23 +9,28 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
+      --cfa-primary: #00a2c7;
+      --cfa-secondary: #ffce5c;
+      --cfa-mint: #63c48f;
+      --cfa-softblue: #e6f6fb;
+      --cfa-softgray: #f6f7f9;
       --male-bg: #c9f0ff;
       --female-bg: #ffe7b8;
       --male-accent: #00a0d2;
       --female-accent: #d68000;
       --ink: #4a371f;
       --muted: #666;
-      --card: #fffaf4;
+      --card: #ffffff;
       --line-bg: #f7f7f7;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: radial-gradient(circle at 20% 20%, #fff4e6 0, #fffaf5 35%, #f7fbff 70%);
+      background: linear-gradient(180deg, #f0fbff 0%, #ffffff 55%, #fef6ea 100%);
       font-family: "Noto Sans JP", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       line-height: 1.6;
-      padding: 32px 16px 64px;
+      padding: 32px 16px 72px;
     }
     .page {
       max-width: 960px;
@@ -33,17 +38,17 @@
     }
     header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     header h1 {
       margin: 6px 0 4px;
-      font-size: 26px;
+      font-size: 27px;
       letter-spacing: 0.04em;
-      color: #9b6b00;
+      color: #0084aa;
     }
     header p {
       margin: 0;
-      color: #e0009c;
+      color: #f06aa2;
       font-weight: 700;
       font-size: 15px;
     }
@@ -60,7 +65,7 @@
       font-weight: 700;
       cursor: pointer;
       color: #fff;
-      transition: transform 0.12s ease, box-shadow 0.2s ease;
+      transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
       background: var(--male-accent);
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
     }
@@ -68,6 +73,7 @@
     .chip.is-active {
       transform: translateY(-1px);
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      filter: saturate(1.08);
     }
     .card {
       background: var(--card);
@@ -80,7 +86,8 @@
       border-radius: 18px;
       padding: 18px 14px;
       margin-bottom: 14px;
-      transition: background 0.25s ease;
+      transition: background 0.25s ease, border 0.25s ease;
+      border: 1px solid rgba(0, 0, 0, 0.05);
     }
     .panel h2 {
       margin: 0 0 10px;
@@ -95,7 +102,7 @@
       gap: 6px;
       padding: 6px 12px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.7);
+      background: #fff;
       font-weight: 700;
       font-size: 12px;
       color: var(--ink);
@@ -127,25 +134,25 @@
     }
     .counts {
       font-weight: 700;
-      color: var(--muted);
+      color: #0f6f8a;
     }
     button.action {
       border: none;
-      background: linear-gradient(120deg, #3ac6ff, #00a0d2);
+      background: linear-gradient(120deg, #00a2c7, #63c48f);
       color: #fff;
       font-weight: 700;
       padding: 12px 18px;
       border-radius: 12px;
       cursor: pointer;
       min-width: 160px;
-      box-shadow: 0 10px 20px rgba(0, 160, 210, 0.24);
+      box-shadow: 0 10px 20px rgba(0, 162, 199, 0.22);
       transition: transform 0.14s ease, box-shadow 0.2s ease;
     }
-    .action:hover { transform: translateY(-1px); box-shadow: 0 14px 24px rgba(0, 160, 210, 0.26); }
+    .action:hover { transform: translateY(-1px); box-shadow: 0 14px 24px rgba(0, 162, 199, 0.26); }
     .action:active { transform: translateY(1px); }
     .result {
       margin-top: 16px;
-      background: var(--line-bg);
+      background: var(--cfa-softgray);
       border-radius: 16px;
       padding: 14px;
       border: 1px solid rgba(0, 0, 0, 0.05);
@@ -182,6 +189,117 @@
       font-size: 13px;
       color: var(--muted);
     }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--cfa-softblue);
+      color: #006c86;
+      border-radius: 999px;
+      font-weight: 700;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      font-size: 12px;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      padding: 16px;
+      z-index: 10;
+    }
+    .modal.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal__content {
+      width: min(640px, 96vw);
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.14);
+      position: relative;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transform: scale(0.96);
+      opacity: 0;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .modal.is-open .modal__content {
+      transform: scale(1);
+      opacity: 1;
+    }
+    .modal__close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      border: none;
+      background: #f3f6f9;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #0f6f8a;
+    }
+    .modal__body {
+      display: grid;
+      grid-template-columns: 1fr 140px;
+      gap: 14px;
+      align-items: center;
+    }
+    .modal__illustration {
+      width: 100%;
+      height: 140px;
+      background: var(--cfa-softgray);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .modal__illustration img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .modal__title {
+      margin: 0 0 6px;
+      font-size: 20px;
+      color: #005d77;
+    }
+    .modal__text {
+      margin: 0;
+      color: #444;
+      line-height: 1.7;
+    }
+    .modal__bar {
+      margin: 14px 0 10px;
+      height: 10px;
+      background: var(--cfa-softgray);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .modal__bar-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(120deg, var(--cfa-primary), var(--cfa-mint));
+      transition: width 0.35s ease;
+    }
+    .modal__footer {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: #0f6f8a;
+      font-weight: 700;
+    }
     @media (max-width: 600px) {
       body { padding: 20px 10px 48px; }
       .list { grid-template-columns: 1fr; }
@@ -195,6 +313,7 @@
     <header>
       <img src="https://raw.githubusercontent.com/googlefonts/noto-emoji/main/svg/emoji_u1f497.svg" alt="heart" width="60" height="60" aria-hidden="true">
       <h1>プレコンセプションケア・チェックシート</h1>
+      <div class="badge">こども家庭庁インスパイア</div>
       <p>〜もっとすてきな自分に、そして未来の家族のために〜</p>
     </header>
 
@@ -214,14 +333,14 @@
           <div class="counts" id="counts">0 / 0 チェック</div>
           <div style="display:flex; gap:8px; align-items:center;">
             <button class="action" id="diagnoseBtn">診断する</button>
-            <button class="action" style="background: #ff9d3a; box-shadow: 0 10px 20px rgba(255,157,58,0.22);" id="resetBtn">リセット</button>
+            <button class="action" style="background: var(--cfa-secondary); box-shadow: 0 10px 20px rgba(255,206,92,0.32);" id="resetBtn">リセット</button>
           </div>
         </div>
       </div>
 
       <div class="result">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-          <strong>メッセージ</strong>
+          <strong>ポップ診断プレビュー</strong>
           <span class="pill" id="miniScore">0% 完了</span>
         </div>
         <div class="bubble">
@@ -229,6 +348,22 @@
           <p id="resultText">チェックを入れて「診断する」を押すと、あなたの今のプレコン度をお届けします。</p>
         </div>
         <p class="hint">できるところから一つずつ。パートナーともシェアして、未来の家族を一緒に守ろう。</p>
+      </div>
+    </div>
+
+    <div class="modal" id="resultModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalText" aria-hidden="true">
+      <div class="modal__content">
+        <button class="modal__close" id="modalClose" aria-label="結果を閉じる">×</button>
+        <p class="badge" id="modalBadge">診断結果</p>
+        <h3 class="modal__title" id="modalTitle">診断結果がここに表示されます</h3>
+        <div class="modal__bar">
+          <div class="modal__bar-fill" id="modalBar"></div>
+        </div>
+        <p class="modal__text" id="modalText">「診断する」を押すと、ポップアップで結果が届きます。</p>
+        <div class="modal__footer">
+          <span id="modalSummary"></span>
+          <span id="modalPercent"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -296,11 +431,20 @@
     const diagnoseBtn = document.getElementById("diagnoseBtn");
     const resetBtn = document.getElementById("resetBtn");
     const chips = document.querySelectorAll(".chip");
+    const modal = document.getElementById("resultModal");
+    const modalTitleEl = document.getElementById("modalTitle");
+    const modalTextEl = document.getElementById("modalText");
+    const modalBar = document.getElementById("modalBar");
+    const modalSummary = document.getElementById("modalSummary");
+    const modalPercent = document.getElementById("modalPercent");
+    const modalClose = document.getElementById("modalClose");
+    const modalBadge = document.getElementById("modalBadge");
     let currentGender = "male";
 
     function render() {
       const data = checklist[currentGender];
       panel.style.background = data.bg;
+      panel.style.borderColor = hexToRgba(data.accent, 0.35);
       panelTitle.textContent = data.title;
       pillNote.textContent = data.note;
       list.innerHTML = "";
@@ -348,6 +492,7 @@
       const total = list.querySelectorAll("input[type='checkbox']").length;
       const checked = list.querySelectorAll("input[type='checkbox']:checked").length;
       const ratio = total === 0 ? 0 : checked / total;
+      const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
 
       let title = "";
       let text = "";
@@ -364,6 +509,12 @@
 
       resultTitle.textContent = title;
       resultText.textContent = `チェック数 ${checked} / ${total}。${text}`;
+      openModal({
+        title,
+        text: `チェック数 ${checked} / ${total}。${text}`,
+        percent,
+        summary: `${checked}項目クリア / ${total}項目`
+      });
     }
 
     function resetChecks() {
@@ -384,8 +535,39 @@
 
     diagnoseBtn.addEventListener("click", diagnose);
     resetBtn.addEventListener("click", resetChecks);
+
+    function openModal({ title, text, percent, summary }) {
+      const data = checklist[currentGender];
+      modalTitleEl.textContent = title;
+      modalTextEl.textContent = text;
+      modalSummary.textContent = summary;
+      modalPercent.textContent = `達成度 ${percent}%`;
+      modalBadge.textContent = `${data.title}の診断`;
+      modalBadge.style.background = data.bg;
+      modalBadge.style.color = "#0f6f8a";
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      modalClose.focus();
+      modalBar.style.width = "0";
+      requestAnimationFrame(() => {
+        modalBar.style.width = `${percent}%`;
+      });
+    }
+
+    function closeModal() {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    modalClose.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+    });
+
     render();
   </script>
 </body>
 </html>
-
